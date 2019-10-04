@@ -1,0 +1,41 @@
+Mounting an Android Virtual Device file system in Ubuntu (qcow2 image).
+
+1.- Check if you have "qemu-utils" installed in your system:
+    $ qemu-nbd --help
+
+  If you get something like "Command 'qemu-nbd' not found", then proceed to install "qemu-utils" with:
+  $ sudo apt install qemu-utils
+  Otherwise, skip this part.
+
+2.- Load and setup NBD (network block device) kernel module. The default "max_part" of NBD is set to 0, so you have to set this number to a safe number depending on the number of partitions you're gonna mount.
+In case you are not sure, set it up to 4 as follows:
+  $ sudo modprobe nbd max_part=4
+
+3.- Connect the qcow2 image as a network block device.
+  For this step, you need to specify the full path to the system image of your Android Virtual Device.
+  In this example, the virtual device is named "Zona", so under the avd folder it appears as "Zona.avd" and the full path to the system image is "~/.android/avd/Zona.avd/system.img.qcow2".
+  Then, you need to determine the name of the device. In this case, it's the first device that will be connected, so the name will be "nbd0".
+  If this was the second device to be connected, it will be "nbd1", and so on.
+    $ sudo qemu-nbd --connect=/dev/nbd0 ~/.android/avd/Zona.avd/system.img.qcow2
+
+4.- Check the partition that you want to mount.
+  You can list the partitions of the Android Virtual Device with "fdisk" using the connected device name from the previous step.
+  In this case, it is "nbd0", so:
+    $ sudo fdisk /dev/nbd0 -l
+
+  In this example, the only partition of the device is listed as follows:
+  Device      Start     End Sectors  Size Type
+  /dev/nbd0p1  2048 5244927 5242880  2.5G Linux filesystem
+
+  So, "/dev/nbd0p1" is the partition that will be mounted in the next step.
+
+5.- Mount the partition from the Android Virtual Device.
+  If you haven't created a mounting point for your partition you can create a folder for that purpose.
+  For this example, a folder named "android" will be created under "/media", but you can create the folder in some other part on your system:
+    $ sudo mkdir /media/android
+
+  Now, mount the partition specifying the name (from step 4) and the mounting point (the full path of the folder):
+    $ sudo mount /dev/nbd0p1 /media/android/
+
+  Now you should be able to access the content of the Android Virtual Device:
+    $ ls /media/android/
