@@ -1,0 +1,70 @@
+BIP39 12 word seed phrase structure:
+
+* ANY NUMBER OF 128 BITS (16 BYTES) COULD WORK AS PRIVATE KEY TO GENERATE A 12 WORD SEED PHRASE.
+RANGING FROM:
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+TO:
+11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+
+There are 2048 possible words, each one corresponding to an INDEX in the word list (BIP39 official word list)
+ranging from 0 to 2047.
+So a 12 word seed phrase has its corresponding 12 index numbers.
+Each index is represented by an 11 bit "space".
+We take 11 "spaces"(indexes asociated to words) of 11 bit each as our partial private key:
+
+   Word 1:     Word 2:     Word 3:     Word 4:
+11111111111 11111111111 11111111111 11111111111
+   Word 5:     Word 6:     Word 7:     Word 8:
+11111111111 11111111111 11111111111 11111111111
+   Word 9:    Word 10:    Word 11:
+11111111111 11111111111 11111111111
+
+11 words of 11 bits give us a total of 121 bits.
+We need to complete a multiple of 8 bits (128 bits in the case of a 12 word seed),
+there for, we need another 7 bits to complete 128 bits.
+There are 128 possible numbers ('0 to 127') that can fill the gap (127 is the maximum
+number that can be possibly stored in 7 bits). Any of those numbers is a valid option.
+We choose one of them and follow the algorithm.
+
+We complete a 128 bit number with those 7 bits
+11 words * 11 bits + 7 bits = 128 bits:
+
+   Word 1:     Word 2:     Word 3:     Word 4:
+11111111111 11111111111 11111111111 11111111111
+   Word 5:     Word 6:     Word 7:     Word 8:
+11111111111 11111111111 11111111111 11111111111
+   Word 9:    Word 10:    Word 11:    Word 12 (incomplete, 4 bits missing):
+11111111111 11111111111 11111111111 1111111
+
+128 bit number (16 Bytes), this is our private key:
+11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+From this number we can regenerate the complete seed phrase no matter what.
+So another aproach to generate a new seed phrase (instead of selecting 11 base words from the
+word list) could be:
+Get a 128 bit random number and calculate the check sum word as follows.
+
+We hash that number (sha256) whatever it is, and we get a 256 bit hash.
+0x????????????????????????????????????????????????????????????????
+We extract the first 4 bits from that hash.
+b????
+
+We complete the last word index with those 4 bits:
+   Word 1:     Word 2:     Word 3:     Word 4:
+11111111111 11111111111 11111111111 11111111111
+   Word 5:     Word 6:     Word 7:     Word 8:
+11111111111 11111111111 11111111111 11111111111
+   Word 9:    Word 10:    Word 11:    Word 12:
+11111111111 11111111111 11111111111 1111111????
+
+That is the checksum word index number (1111111????), corresponding to the
+checksum word, there for, the last word of the 12 word seed phrase.
+
+The derivation paths alter the way the keys are generated from that seed phrase, so use the
+right one for your needs:
+
+		Address Type:					Derivation Path:
+p2pkh: Legacy Bitcoin address (starts with a 1)			m/44’/0’/0’/0/0
+p2wpkh-p2sh: Wrapped Segwit Bitcoin address (starts with a 3)	m/49'/0'/0'
+p2wpkh: SegWit Bitcoin address (starts with a bc1q)		m/84’/0’/0’/0/0
+Taproot Bitcoin address (starts with a bc1p)			m/86’/0’/0’/0/0
+
