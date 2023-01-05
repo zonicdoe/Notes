@@ -1,10 +1,14 @@
 BIP39 12 word seed phrase structure:
 
 * ANY NUMBER OF 128 BITS (16 BYTES) COULD WORK AS PRIVATE KEY TO GENERATE A 12 WORD SEED PHRASE.
+* ANY NUMBER OF 256 BITS (32 BYTES) COULD WORK AS PRIVATE KEY TO GENERATE A 24 WORD SEED PHRASE.
 RANGING FROM:
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000...00000000
 TO:
-11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+11111111...11111111
+
+ATENTION! when converting text to any other representation (like hex or binary) always consider the encoding
+(EX. UTF-8).
 
 There are 2048 possible words, each one corresponding to an INDEX in the word list (BIP39 official word list)
 ranging from 0 to 2047.
@@ -41,11 +45,14 @@ We complete a 128 bit number with those 7 bits
 From this number we can regenerate the complete seed phrase no matter what.
 So another aproach to generate a new seed phrase (instead of selecting 11 base words from the
 word list) could be:
-Get a 128 bit random number and calculate the check sum word as follows.
+Get a 128 bit (or 256 bit for a 24 word seedphrase) random number and calculate the check sum word as follows.
 
 We hash that number (sha256) whatever it is, and we get a 256 bit hash.
 0x????????????????????????????????????????????????????????????????
-We extract the first 4 bits from that hash.
+We extract the first 4 bits from that hash (or 8 bits in the case of a 24 word seedphrase).
+ATENTION! some times when you extract the binary version of the hash, the result is not always 256 bit long.
+This occurs because depending of the converison method, the leading 0s are trimed, so always add 0s
+at the begining of the binary string if needed to complete a 256 bit binary string.
 b????
 
 We complete the last word index with those 4 bits:
