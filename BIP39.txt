@@ -66,6 +66,11 @@ We complete the last word index with those 4 bits:
 That is the checksum word index number (1111111????), corresponding to the
 checksum word, there for, the last word of the 12 word seed phrase.
 
+Ex. 128 bit number for a 12 seed phrase: 0x6a61706f7168706961736e73646b6b66
+Gives you: heavy argue bridge tissue mandate cruise magic horse inflict cash suspect slush
+Ex. 256 bit number for a 24 word seed phrase: 0x6a61706f7168706961736e73646b6b663032686623256c2f292625244526686a
+Gives you: heavy argue bridge tissue mandate cruise magic horse inflict cash suspect small add crouch obtain gorilla history junk end engage dust nasty payment exhibit
+
 The derivation paths alter the way the keys are generated from that seed phrase, so use the
 right one for your needs:
 
